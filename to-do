@@ -1,0 +1,12 @@
+things to fiddle with
+
+vary N
+vary n // N
+v clustered in V or not
+use S or W
+normalize S (or W?)
+vertex attributes
+normalization of W, S
+what kernel (gaussian, 1/(abs + 1), etc)
+discretization method
+
