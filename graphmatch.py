@@ -36,7 +36,7 @@ def row_norm_matrix(A, shape=None):
     return Q
 
 
-def random_vertices(N,n):
+def random_vertices(N,n, clustered=False):
     """uniformly distributed points in xy-plane.
     a random subset of size n<=N is returned separately. 
     """
@@ -44,14 +44,25 @@ def random_vertices(N,n):
     assert n <= N
 
     # A is a 2xN matrix representing N points in the xyplane between [0,100)
-    A = 100*np.random.rand(2,N)
+    A = 500*np.random.rand(2,N)
     
-    # the following columns are to be extracted
-    # these can serve as identifiers/labels for X
-    id_extracted = np.random.permutation(N)[:n] 
-    
-    # this is now a 2xn matrix whose ith column
-    X = A[:,id_extracted]
+    if clustered:
+        # get a random point
+        x0 =  A[:,np.random.randint(A.shape[1])]
+        # get n nearest points to x0
+        x0 = x0.reshape(-1,1)
+        s = ((A*A).sum(axis=0) - (x0*x0).sum(axis=0)).argsort()
+
+        id_extracted = s[:n]
+        X = A[:,id_extracted]
+
+    else:
+        # the following columns are to be extracted
+        # these can serve as identifiers/labels for X
+        id_extracted = np.random.permutation(N)[:n] 
+        
+        # this is now a 2xn matrix whose ith column
+        X = A[:,id_extracted]
    
     return A, X, id_extracted 
 
@@ -113,16 +124,8 @@ def build_P(N,n):
     P = np.eye(N*n) - P
 
     return P, C
-    
+
 def discretize(p):
-
-    guess = p.argmax(axis=0)
-
-    if len(set(guess)) != p.shape[1]:
-        print("there was a collision")
-    return guess
-
-def discretize2(p):
     """
     this is terrible code, please rewrite
     this approximates masked arrays, but i can't figure
@@ -150,10 +153,19 @@ def discretize2(p):
 
         p[match] = 1
 
+
+    # then really these should be sorted by which x corresponds to what
+    # just to make the matches clearer
+
+    # of course i could do this in the array interface...
+    m = list(matches)
+    m.sort(key=(lambda x:x[1]))
+
+    np.array(m)
     return p
 
 
-def graph_match(N,n):
+def graph_match(N,n, clustered=False):
 
     """
     main function. add description
@@ -164,7 +176,7 @@ def graph_match(N,n):
     """
     assert N >= n
 
-    A, X, ids = random_vertices(N,n)
+    A, X, ids = random_vertices(N,n, clustered)
 
     # these are now the graph attributes of each graph
     D = calculate_edges(A)
@@ -191,7 +203,7 @@ def graph_match(N,n):
     el, ev = scipy.sparse.linalg.eigs(S, 1)
    
     # now THIS is our solution, which much be normalized
-    x = el*ev
+    x = ev
     descale = C.dot(x)[0,0]
     x /= descale
 
@@ -204,9 +216,7 @@ def graph_match(N,n):
     
     x_orth = u.dot(v.T)
 
-    #est = discretize(x_orth)
-
-    p_est = discretize2(x_orth)
+    p_est = discretize(x_orth)
     est = p_est.argmax(axis=0)
     
     print("N={}, n={}".format(N,n))
@@ -216,6 +226,27 @@ def graph_match(N,n):
     
     return A, X, ids, est, D, d
 
+def get_accuracy(real_vertices, estimated_vertices):
+    """
+    inputs are two 1D arrays of the same length, representing
+    vertex numbers
+
+    returns total amount of correct matches. note that this could be less than
+    what appears visually. for example,
+    real -> [2, 3, 4]
+    est  -> [3, 2, 4]
+
+    will result in only 33% accuracy reported, even though this graphs might
+    look identical visually.
+    """
+
+
+    assert real_vertices.size == estimated_vertices.size
+
+    hits = (real_vertices == estimated_vertices).sum()
+
+    return 100*(hits / real_vertices.size)
+
 if __name__ == "__main__":
     
     from visual import plot_system, compare_estimated
@@ -223,11 +254,9 @@ if __name__ == "__main__":
     N = 23
     n = 5
     
-    A, X, ids, est, D, d = graph_match(N,n)
-
-    #f1 = plot_system(A,X, fid=1)
-    #Xest = A[:,est] 
-    #f2 = plot_system(A,Xest, fid=2)
+    A, X, ids, est, D, d = graph_match(N,n, clustered=True)
 
     fig = compare_estimated(A,ids,est)
+    accuracy = get_accuracy(ids, est)
+    print('pairwise accuracy: {}%'.format(accuracy))
 
