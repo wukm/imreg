@@ -124,9 +124,12 @@ def discretize(p):
 
 def graph_match(N,n):
 
-    """ note:
+    """
+    main function. add description
 
-    want same systems of stuff to be good and work hard
+    returns A, X, ids, est
+
+    s.t. A[:,ids] == X
     """
     assert N >= n
 
@@ -176,11 +179,20 @@ def graph_match(N,n):
     #print("correct values:\n", set(ids))
     #print("the guess:\n", set(est))
     print("how'd we do:", set(ids) - set(est))
-
+    
+    return A, X, ids, est
 if __name__ == "__main__":
+    
+    from visual import plot_system, compare_estimated
 
-    for N in [8, 20, 51, 89]:
+    N = 20
+    n = 5
+    
+    A, X, ids, est = graph_match(N,n)
 
-        for percent in [.10,.33,.66]:
-            n = max(int(N * percent), 1)
-            graph_match(N,n)
+    #f1 = plot_system(A,X, fid=1)
+    #Xest = A[:,est] 
+    #f2 = plot_system(A,Xest, fid=2)
+
+    fig = compare_estimated(A,ids,est)
+
