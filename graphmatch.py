@@ -122,6 +122,37 @@ def discretize(p):
         print("there was a collision")
     return guess
 
+def discretize2(p):
+    """
+    this is terrible code, please rewrite
+    this approximates masked arrays, but i can't figure
+    out how to do this thing with np.ma
+    """
+
+    matches = []
+
+    mask_val = -np.inf 
+    for i in range(p.shape[1]):
+        # find the highest remaining element
+        w = np.unravel_index(p.argmax(), p.shape)
+        # "zero out" its row and column in a noninterfering way (if p was
+        # overwhelming negative this could be buggy  
+
+        p[w[0],:] = mask_val
+        p[:,w[1]] = mask_val
+        matches.append(w) # these will be filled in later.
+    
+    # p should be exactly blank now. 
+    #assert not p.any()
+
+    p = np.zeros_like(p)
+    for match in matches:
+
+        p[match] = 1
+
+    return p
+
+
 def graph_match(N,n):
 
     """
@@ -173,22 +204,26 @@ def graph_match(N,n):
     
     x_orth = u.dot(v.T)
 
-    est = discretize(x_orth)
+    #est = discretize(x_orth)
 
+    p_est = discretize2(x_orth)
+    est = p_est.argmax(axis=0)
+    
     print("N={}, n={}".format(N,n))
     #print("correct values:\n", set(ids))
     #print("the guess:\n", set(est))
-    print("how'd we do:", set(ids) - set(est))
+    #print("how'd we do:", set(ids) - set(est))
     
-    return A, X, ids, est
+    return A, X, ids, est, D, d
+
 if __name__ == "__main__":
     
     from visual import plot_system, compare_estimated
 
-    N = 20
+    N = 23
     n = 5
     
-    A, X, ids, est = graph_match(N,n)
+    A, X, ids, est, D, d = graph_match(N,n)
 
     #f1 = plot_system(A,X, fid=1)
     #Xest = A[:,est] 
