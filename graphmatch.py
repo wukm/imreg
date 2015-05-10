@@ -38,7 +38,7 @@ def row_norm_matrix(A, shape=None):
     return Q
 
 
-def random_vertices(N,n, clustered=False, transform=False):
+def random_vertices(N,n, clustered=False, transform=False, scale=False):
     """uniformly distributed points in xy-plane.
     a random subset of size n<=N is returned separately. 
     """
@@ -76,7 +76,10 @@ def random_vertices(N,n, clustered=False, transform=False):
 
         # the affine translation bit will literally just be zeroing out
         X - X.min(axis=1).reshape(-1,1)
-
+    
+    if scale:
+        scale = 100*np.random.rand()
+        X *= scale
     return A, X, id_extracted 
 
 
@@ -109,9 +112,6 @@ def build_similarities(D,d):
     """
     W = np.tile(d, D.shape)
     W0 = np.kron(D, np.ones(d.shape))
-    
-    #W = np.tile(D, d.shape)
-    #W0 = np.kron(d, np.ones(D.shape))
 
     W = W - W0 
 
@@ -142,9 +142,16 @@ def build_P(N,n):
 
 def discretize(p):
     """
-    this is terrible code, please rewrite
-    this approximates masked arrays, but i can't figure
-    out how to do this thing with np.ma
+    turn an Nxn matrix into a rectangular "permutation" matrix.
+    discretization occurs by choosing the element with highest value compared to
+    its column, and then disallowing further selection of elements in its row
+    and column. 
+    
+    returns p, a Nxn matrix, which then can be reduced to an actual vertex to
+    vertex association by p.argmax(axis=0)
+
+    note: this implementation is probably very memory inefficent. there's
+    probably a way to do this via masked arrays or something. idk
     """
 
     matches = []
@@ -163,9 +170,6 @@ def discretize(p):
         p[:,w[1]] = mask_val
         matches.append(w) # these will be filled in later.
     
-    # p should be exactly blank now. 
-    #assert not p.any()
-
     p = np.zeros_like(p)
     for match in matches:
 
@@ -183,7 +187,7 @@ def discretize(p):
     return p
 
 
-def graph_match(N,n, clustered=False, transform=False):
+def graph_match(N,n, clustered=False, transform=False, scale=False):
 
     """
     main function. add description
@@ -194,7 +198,7 @@ def graph_match(N,n, clustered=False, transform=False):
     """
     assert N >= n
 
-    A, X, ids = random_vertices(N,n, clustered, transform)
+    A, X, ids = random_vertices(N,n, clustered, transform, scale)
 
     # these are now the graph attributes of each graph
     D = calculate_edges(A)
@@ -277,9 +281,10 @@ if __name__ == "__main__":
     n = 4
     clustered= False
     transform = True
+    scale= False
 
     A, X, ids, est, D, d = graph_match(N,n, clustered=clustered,
-            transform=transform)
+            transform=transform, scale=scale)
 
     fig = compare_estimated(A,ids,est)
 
