@@ -5,6 +5,8 @@ import numpy.random
 import scipy.sparse
 import scipy.sparse.linalg
 
+from IPython.core.debugger import Tracer
+
 def row_norm_matrix(A, shape=None):
     """
     needed for forming M
@@ -95,9 +97,11 @@ def build_similarities(D,d):
 
     """
     W = np.tile(d, D.shape)
-
     W0 = np.kron(D, np.ones(d.shape))
     
+    #W = np.tile(D, d.shape)
+    #W0 = np.kron(d, np.ones(D.shape))
+
     W = W - W0 
 
     return abs(W)
@@ -133,6 +137,9 @@ def discretize(p):
     """
 
     matches = []
+    
+    # normalize p (should grab best matches first now)
+    p /= p.sum(axis=0)
 
     mask_val = -np.inf 
     for i in range(p.shape[1]):
@@ -153,15 +160,15 @@ def discretize(p):
 
         p[match] = 1
 
-
     # then really these should be sorted by which x corresponds to what
     # just to make the matches clearer
 
     # of course i could do this in the array interface...
-    m = list(matches)
-    m.sort(key=(lambda x:x[1]))
+    #m = list(matches)
+    #m.sort(key=(lambda x:x[1]))
+    
 
-    np.array(m)
+    #return p
     return p
 
 
@@ -209,20 +216,24 @@ def graph_match(N,n, clustered=False):
 
     # reshape into an Nxn matrix, and we should be able to discretize that into
     # a permutation matrix
-
-    xm = x.reshape((N,n)).real
-
-    u, s, v = np.linalg.svd(xm,full_matrices=False)
     
-    x_orth = u.dot(v.T)
+
+    xm = x.reshape((N,n))
+    #xm = x.reshape((n,N))
+    #xm = xm.T
+
+    # i don't know how we picked up the complex parts...
+    
+    xm = xm.real
+
+    #u, s, v = np.linalg.svd(xm,full_matrices=False)
+    
+    #x_orth = u.dot(v.T)
+    x_orth = xm
 
     p_est = discretize(x_orth)
     est = p_est.argmax(axis=0)
     
-    print("N={}, n={}".format(N,n))
-    #print("correct values:\n", set(ids))
-    #print("the guess:\n", set(est))
-    #print("how'd we do:", set(ids) - set(est))
     
     return A, X, ids, est, D, d
 
@@ -251,12 +262,19 @@ if __name__ == "__main__":
     
     from visual import plot_system, compare_estimated
 
-    N = 23
-    n = 5
-    
-    A, X, ids, est, D, d = graph_match(N,n, clustered=True)
+    N = 70
+    n = 12
+
+    A, X, ids, est, D, d = graph_match(N,n, clustered=False)
 
     fig = compare_estimated(A,ids,est)
-    accuracy = get_accuracy(ids, est)
-    print('pairwise accuracy: {}%'.format(accuracy))
+    show = fig.show # convenience
 
+    accuracy = get_accuracy(ids, est)
+    s_accuracy = 100*(1 - len(set(ids) - set(est)) / len(ids))
+
+    print("N={}, n={}".format(N,n))
+    print("correct values:\n", list(ids))
+    print("the guess:\n", list(est))
+    print('pairwise accuracy: {}%'.format(accuracy))
+    print('setwise accuracy: {}%'.format(s_accuracy))
