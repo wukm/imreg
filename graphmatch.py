@@ -282,7 +282,9 @@ if __name__ == "__main__":
             transform=transform)
 
     fig = compare_estimated(A,ids,est)
-    show = fig.show # convenience
+
+    if transform:
+        figt = plot_system(None, X)
 
     accuracy = get_accuracy(ids, est)
     s_accuracy = 100*(1 - len(set(ids) - set(est)) / len(ids))

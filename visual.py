@@ -17,7 +17,9 @@ def plot_system(A,X, fid=None):
         fig = plt.figure(1)
     else:
         fig = plt.figure(fid)
-    plt.plot(A[0],A[1], 'o')
+    
+    if A is not None:
+        plt.plot(A[0],A[1], 'o')
     
     #thanks to this http://stackoverflow.com/a/6834693
     plt.plot(
