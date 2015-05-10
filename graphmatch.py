@@ -38,7 +38,7 @@ def row_norm_matrix(A, shape=None):
     return Q
 
 
-def random_vertices(N,n, clustered=False):
+def random_vertices(N,n, clustered=False, transform=False):
     """uniformly distributed points in xy-plane.
     a random subset of size n<=N is returned separately. 
     """
@@ -57,7 +57,7 @@ def random_vertices(N,n, clustered=False):
 
         id_extracted = s[:n]
         X = A[:,id_extracted]
-
+    
     else:
         # the following columns are to be extracted
         # these can serve as identifiers/labels for X
@@ -65,7 +65,18 @@ def random_vertices(N,n, clustered=False):
         
         # this is now a 2xn matrix whose ith column
         X = A[:,id_extracted]
-   
+  
+    if transform:
+        # get a random theta
+        theta = 2*np.pi*np.random.rand()
+        T = np.array([[np.cos(theta), -np.sin(theta)],
+                      [np.sin(theta), np.cos(theta)]])
+
+        X = T.dot(X)
+
+        # the affine translation bit will literally just be zeroing out
+        X - X.min(axis=1).reshape(-1,1)
+
     return A, X, id_extracted 
 
 
@@ -172,7 +183,7 @@ def discretize(p):
     return p
 
 
-def graph_match(N,n, clustered=False):
+def graph_match(N,n, clustered=False, transform=False):
 
     """
     main function. add description
@@ -183,7 +194,7 @@ def graph_match(N,n, clustered=False):
     """
     assert N >= n
 
-    A, X, ids = random_vertices(N,n, clustered)
+    A, X, ids = random_vertices(N,n, clustered, transform)
 
     # these are now the graph attributes of each graph
     D = calculate_edges(A)
@@ -261,11 +272,14 @@ def get_accuracy(real_vertices, estimated_vertices):
 if __name__ == "__main__":
     
     from visual import plot_system, compare_estimated
+    
+    N = 20
+    n = 4
+    clustered= False
+    transform = True
 
-    N = 70
-    n = 12
-
-    A, X, ids, est, D, d = graph_match(N,n, clustered=False)
+    A, X, ids, est, D, d = graph_match(N,n, clustered=clustered,
+            transform=transform)
 
     fig = compare_estimated(A,ids,est)
     show = fig.show # convenience
@@ -274,7 +288,7 @@ if __name__ == "__main__":
     s_accuracy = 100*(1 - len(set(ids) - set(est)) / len(ids))
 
     print("N={}, n={}".format(N,n))
-    print("correct values:\n", list(ids))
-    print("the guess:\n", list(est))
+    #print("correct values:\n", list(ids))
+    #print("the guess:\n", list(est))
     print('pairwise accuracy: {}%'.format(accuracy))
     print('setwise accuracy: {}%'.format(s_accuracy))
