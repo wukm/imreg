@@ -133,8 +133,12 @@ def graph_match(D,d):
     
     # now reshape back to a row vector (now discretized) and calculate energy
     x = p_est.reshape((N*n, 1))
+
+    # this will be a 1x1 matrix
     energy = x.T.dot(W).dot(x)
-    
+    # so grab the element
+    energy = energy[0,0] 
+
     return est, energy
 
 if __name__ == "__main__":

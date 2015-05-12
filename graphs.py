@@ -107,3 +107,27 @@ def calculate_edges(M):
     D = D + D.T
 
     return np.sqrt(D)
+
+def scale_range(D,d):
+    """
+    get a lower and upper bound for the scaling problem
+   
+    INPUT
+    d: a matrix, subgraph edge attributes (distances)
+    D: a matrix, graph edge attributes (distances)
+    
+    OUTPUT
+    (kmin, kmax) - two real numbers representing the minimum and maximum
+    possible scaling factors to make k*d represent a subgraph of D
+    """
+
+    # get minimum and maximum distance in the graph
+    Amax = D.max()
+    Amin = D[D > 0].min() # since D has zeros on diagonals
+
+    # ditto for subgraph
+    amax = d.max()
+    amin = d[d>0].min() # d has zeros on diagonals
+
+    return Amin/amin, Amax/amax
+
