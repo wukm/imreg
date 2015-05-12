@@ -14,9 +14,9 @@ def plot_system(A,X, fid=None):
     fig.show()
     """
     if fid is None:
-        fig = plt.figure(1)
-    else:
-        fig = plt.figure(fid)
+        fid = 1
+
+    fig = plt.figure(fid)
     
     if A is not None:
         plt.plot(A[0],A[1], 'o')
@@ -28,7 +28,7 @@ def plot_system(A,X, fid=None):
     
     return fig
 
-def compare_estimated(A,ids,est):
+def compare_estimated(A,ids,est, fid=None):
     """
     this should be wholly unnecessary, but here we are
     """
@@ -36,7 +36,10 @@ def compare_estimated(A,ids,est):
     X = A[:,ids]
     Xest = A[:,est]
 
-    fig = plt.figure()
+    if fid is None:
+        fid = 1
+
+    fig = plt.figure(fid)
     ax1 = fig.add_subplot(211)
     ax2 = fig.add_subplot(212)
 
