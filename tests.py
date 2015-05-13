@@ -46,8 +46,9 @@ def scaling_problem(make_figures=False):
     W = build_similarities(D,d)
     exact_energy = match_energy(W, ids, shape=(N,n))
 
-    #del W
+    del W
     print('exact energy:', exact_energy)
+
 
     est, energy = graph_match(D, d)
     accuracy = get_accuracy(ids, est)
@@ -66,6 +67,10 @@ def scaling_problem(make_figures=False):
     d_unscaled = calculate_edges(X) 
     # get the minimum and maximum possible scaling factors for the two graphs
     kmin, kmax = scale_range(D,d_unscaled) 
+    
+    best_accuracy = 0
+    best_energy =  0
+    estimated_scale = 0
 
     for k in np.linspace(kmin,kmax, num=mesh_size):
 
@@ -84,13 +89,24 @@ def scaling_problem(make_figures=False):
         print('k={}'.format(k))
         print('pairwise accuracy: {}%'.format(accuracy))
         print('energy:', energy)
-    
+        
+        if energy > best_energy:
+            best_energy=energy
+            best_accuracy=accuracy
+            estimated_scale=k
+
+    print('*'*80)
+    print("best energy: ", best_energy)
+    print("corresp. accuracy: ", best_accuracy)
+    print("estimated scale_factor", estimated_scale)
+    print("real scale value:", scale_by)
+
 def simple(make_figures=True): 
     """
     basic test, one random system
     """
-    N = 30
-    n = 10
+    N = 60
+    n = 5
 
     clustered= False
     transform = True
@@ -114,48 +130,62 @@ def simple(make_figures=True):
             figt = plot_system(None, X, fid=1)
 
     print("N={}, n={}".format(N,n))
-    print('pairwise accuracy: {}%'.format(accuracy))
-    
+    print('pairwise accuracy of match: {}%'.format(accuracy))
+    print('energy of match:', energy)
+   
+    return accuracy, energy
 
-#def vary_sizes(figures=False):
-#    """
-#    finish this. this shows how the algorithm fares for different sizes of the
-#    system, as well as size of the subgraph relative.
-#    """
-#    N = 30
-#
-#    percents = [.10,.33,.66,.90]
-#
-#
-#    for p in percents:
-#        n = max(int(N*p),1)
-#    
-#    assert N >= n
-#
-#    clustered= False
-#    transform = True
-#    scale= False
-#
-#    A, X, ids = random_vertices(N,n clustered,transform,scale)
-#
-#
-#    # these are now the graph attributes of each graph
-#    D = calculate_edges(A)
-#    # you could also just 'extract' this from D if you're clever
-#    d = calculate_edges(X)
-#
-#    est = graph_match(D,d)
-#
-#    #fig = compare_estimated(A,ids,est)
-#
-#    #if transform:
-#    #    figt = plot_system(None, X)
-#
-#    accuracy = get_accuracy(ids, est)
-#
-#    print("N={}, n={}".format(N,n))
-#    print('pairwise accuracy: {}%'.format(accuracy))
+def simple_average():
+    
+    accuracies = 0
+    energies = 0
+    trials = 200
+    for i in range(trials):
+        a, e = simple(make_figures=False)
+        accuracies += a
+        energies += e
+    
+    accuracies /= trials
+    energies /= trials
+
+    print("average accuracy over {} trials: {}%".format(trials, accuracies))
+    print("average energy:", energies)
+
+def vary_sizes(figures=False):
+    """
+    finish this. this shows how the algorithm fares for different sizes of the
+    system, as well as size of the subgraph relative.
+    """
+    N = 60
+    n = 5 
+    
+    assert N >= n
+
+    clustered= False
+    transform = True
+    scale= False
+
+    A, X, ids = random_vertices(N,n, clustered,transform,scale)
+
+
+    # these are now the graph attributes of each graph
+    D = calculate_edges(A)
+    # you could also just 'extract' this from D if you're clever
+    d = calculate_edges(X)
+
+    est, energy = graph_match(D,d)
+
+    #fig = compare_estimated(A,ids,est)
+
+    #if transform:
+    #    figt = plot_system(None, X)
+
+    accuracy = get_accuracy(ids, est)
+
+    print("N={}, n={}".format(N,n))
+    print('pairwise accuracy: {}%'.format(accuracy))
 
 if __name__ == "__main__":
 
     scaling_problem()
+    #simple_average()

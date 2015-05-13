@@ -1,0 +1,292 @@
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage[english]{babel}
+\usepackage{blindtext}
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{amsxtra, amscd, geometry, graphicx}
+\usepackage{endnotes}
+\usepackage{cancel}
+\usepackage{alltt}
+%\usepackage[all,cmtip]{xypic}
+\usepackage{mathrsfs}
+\usepackage{listings}
+%\usepackage{subfigure}
+\usepackage{subcaption}
+%\usepackage[pdftex]{hyperref}
+%\usepackage[dvips,bookmarks,bookmarksopen,backref,colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue}](hyperref}
+
+% Makes the margin size a little smaller.
+\geometry{letterpaper,margin=1.3in}
+\usepackage{titlesec}
+
+\titleformat*{\section}{\large\bfseries}
+\titleformat*{\subsection}{\normalsize\bfseries}
+% Possible font packages. Choose one and comment out the rest.
+%\usepackage{times}%
+%\usepackage{helvet}%
+%\usepackage{palatino}%
+%\usepackage{bookman}%
+
+% These are italic.
+%\theoremstyle{plain}
+%\newtheorem{thm}{Theorem}
+%\newtheorem*{thm*}{Theorem}
+%\newtheorem{prop}{Proposition}
+%\newtheorem*{prop*}{Proposition}
+%\newtheorem{conj}{Conjecture}
+%\newtheorem*{conj*}{Conjecture}
+%\newtheorem{lem}{Lemma}
+%  \makeatletter
+%  \@addtoreset{lem}{thm}
+%  \makeatother 
+%\newtheorem*{lem*}{Lemma}
+%\newtheorem{cor}{Corollary}
+%  \makeatletter
+%  \@addtoreset{cor}{thm}
+%  \makeatother 
+%\newtheorem*{cor*}{Corollary}
+%
+%%\newtheorem{lem}[thm]{Lemma}
+%%\newtheorem{remark}[thm]{Remark}
+%%\newtheorem{cor}[thm]{Corollary}
+%%\newtheorem{prop}[thm]{Proposition}
+%%\newtheorem{conj}[thm]{Conjecture}
+%
+%% These are normal (i.e. not italic).
+%\theoremstyle{definition}
+%\newtheorem*{ack*}{Acknowledgements}
+%\newtheorem*{app*}{Application}
+%\newtheorem*{apps*}{Applications}
+%\newtheorem{defn}{Definition}
+%\newtheorem*{defn*}{Definition}
+%\newtheorem{eg}{Example}
+%  \makeatletter
+%  \@addtoreset{eg}{thm}
+%  \makeatother 
+%\newtheorem*{eg*}{Example}
+%\newtheorem*{egs*}{Examples}
+%\newtheorem{ex}{Exercise}
+%\newtheorem*{ex*}{Exercise}
+%\newtheorem*{quest*}{Question}
+%\newtheorem{rem}{Remark}
+%\newtheorem*{rem*}{Remark}
+%\newtheorem{rems}{Remarks}
+%\newtheorem*{rems*}{Remarks}
+%\newtheorem{prob}{Problem}
+%\newtheorem*{prob*}{Problem}
+%\newtheorem*{soln*}{Solution}
+%\newtheorem{soln}{Solution}
+%
+%
+%% New Commands: Common Math Symbols
+\providecommand{\R}{\mathbb{R}}%
+%\providecommand{\N}{\mathbb{N}}%
+%\providecommand{\Z}{{\mathbb{Z}}}%
+%\providecommand{\sph}{\mathbb{S}}%
+%\providecommand{\Q}{\mathbb{Q}}%
+%\providecommand{\C}{{\mathbb{C}}}%
+%\providecommand{\F}{\mathbb{F}}%
+%\providecommand{\quat}{\mathbb{H}}%
+%
+%% New Commands: Operators
+%\providecommand{\Gal}{\operatorname{Gal}}%
+%\providecommand{\GL}{\operatorname{GL}}%
+%\providecommand{\card}{\operatorname{card}}%
+%\providecommand{\coker}{\operatorname{coker}}%
+%\providecommand{\id}{\operatorname{id}}%
+%\providecommand{\im}{\operatorname{im}}%
+%\providecommand{\diam}{{\rm diam}}%
+%\providecommand{\aut}{\operatorname{Aut}}%
+%\providecommand{\inn}{\operatorname{Inn}}%
+%\providecommand{\out}{{\rm Out}}%
+%\providecommand{\End}{{\rm End}}%
+%\providecommand{\rad}{{\rm Rad}}%
+%\providecommand{\rk}{{\rm rank}}%
+%\providecommand{\ord}{{\rm ord}}%
+%\providecommand{\tor}{{\rm Tor}}%
+%\providecommand{\comp}{{\text{ $\scriptstyle \circ$ }}}%
+%\providecommand{\cl}[1]{\overline{#1}}%
+%\providecommand{\tr}{{\sf trace}}%
+%
+%\renewcommand{\tilde}[1]{\widetilde{#1}}%
+%\numberwithin{equation}{section}
+%
+%\renewcommand{\epsilon}{\varepsilon}
+%
+%\newcommand*\rfrac[2]{{}^{#1}\!/_{#2}}
+%
+%% This makes the spacing between lines of font a little bigger.  I like the way it looks.
+%\newcommand{\spacing}[1]{\renewcommand{\baselinestretch}{#1}\large\normalsize}
+%\spacing{1.2}
+
+% END PREAMBLE %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Graph Matching in $\R^2$}
+\author{Lucas Wukmer}
+\date{May 12, 2015}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Abstract}
+A energy-maximum method involving Rayleigh quotients is utilized to identify a
+given subset of points in the xy-plane which has been randomly transformed
+(rigid with scaling) with their corresponding points in the original set. Our
+method views these points as a subgraph of a larger attributed (complete)
+graph, whose edge attributes are the euclidan distance between these points
+
+\section{Problem Overview \& Notation}
+In a simplied version of this problem, we consider a set of $N$ random points
+in the xy-plane, and some smaller subset of size $n$:
+
+\begin{subequations}
+  \begin{align}
+    S_A := \left\{ (x,y) \in \R^2 \ | \  0 \leq x,y \leq 100 \right\} \\
+    S_X \subset S_A \\
+  N := |S_A|, \quad n := |S_X|
+  \end{align}
+\end{subequations}
+
+As this choice of notation may suggest, it is often more convenient to view
+this as matrices:
+
+\begin{subequations}
+  \begin{align}
+    %A := \begin{bmatrix}
+    %  \vdots  & \vdots & \  & \vdots \\
+    %  a_1     & a_2    & \cdots   & a_N \\
+    %  \vdots  & \vdots & \  & \vdots
+    %\end{bmatrix} \in \R^{2\times N}\\
+    A := \begin{bmatrix}
+      a_1     & a_2    & \cdots   & a_N
+    \end{bmatrix} \in \R^{2\times N}\\
+    X := \begin{bmatrix}
+      x_1     & x_2    & \cdots   & x_n
+    \end{bmatrix} \in \R^{2\times n}\\
+    N \geq n
+  \end{align}
+\end{subequations}
+
+Of course, we consider it ``known'' the correspondence between X and A. That
+is, we know the $n$ pairs $(i,j)$ such that $x_i = a_j$.
+
+We then wish to apply a (reversible) affine transformation $T_{k, \theta, v}$
+to the subsystem X as follows (given as homogeneous matrices for
+simplification):
+
+\begin{equation}
+  \begin{aligned}
+    \begin{bmatrix}X' \\ 1\end{bmatrix} &:=  T_{k, \theta, v} \begin{bmatrix}X \\ 1\end{bmatrix} \\
+    &= \begin{bmatrix}
+  k\cos\theta & -k\sin\theta & v_x \\
+  k\sin\theta & k\cos\theta & v_y \\
+  0             &   0 & 1
+\end{bmatrix} \begin{bmatrix}X\\1\end{bmatrix} \\
+k \in \R_+, \ \theta &\in [0, 2\pi),  \ v = (v_x, v_y) \in \R^2
+\end{aligned}
+\end{equation}
+
+Our goal is simply to find a matching between X' and the original A without
+knowledge of the transformation $T$ itself. This matching may be thought of as
+the matching matrix $M \in \R^{N\times n}$ such that
+
+\begin{equation}
+  MA = X
+\end{equation}
+
+where\footnote{Yes, I defined three (soon four) systems of notation and somehow managed to abuse them all simulaneously.}
+\begin{equation}
+  M_{ij} := \delta_{ij} \\
+  = \left\{
+    \begin{array}{lr}
+    1 &: T(a_i) = x_j  \\
+    0 &: T(a_i) \notin S_x
+  \end{array}
+  \right.
+\end{equation}
+
+\section{Methods}
+We generate a point set $A$ size $N$ and subset $X$ size $n\leq N$ of uniformly
+random floats in the range $[0,100]$. and transform each X with a uniform
+random $\theta \in [0, 2\pi)$ and $k\in [1,10]$ (our translation vector $v$ is
+simply the one that makes $X'$ have a minimum $x$ and $y$ value of 0 each.
+
+
+We emultate the program introduced by Cour, et al.\cite{citation01} and model
+this problem as a graph matching problem.
+Specifically, we form two symmetric matrices
+$D\in\R^{N \times N} , d\in\R^{n \times n}$ where
+\[
+  D_{ij} := || a_i - a_j ||_2 ,  \quad d_{ij} := || x_i - x_j ||_2
+\]
+
+We view these as edge attributes of the complete graph corresponding to A and its subgraph (which corresponds to X).
+
+The similarity matrix $W \in \R^{Nn \times Nn}$ is then formed as follows:
+\[
+  W_{ii',jj'} := \frac{1}{1 + \left| \  d_{ij} - D_{i'j'}  \right| }
+\]
+
+That is, the $(ii',jj')$ element represents a ``score'' associated with a
+matching containing both $(i,i'),(j,j')$. Note the ordering of elements along
+either axis corresponds exactly to their order in the vectorized version of the
+matching matrix $M$ above. The correct matching matrix $M$ is found as the
+maximum of the following quadratic problem:
+
+\[
+  M \sim x_M := \mathsf{argmax} \left\{ x^T W x \ | \ Cx \leq b \right\}
+\]
+
+with $x_M$ the vectorized version of M. The condition $Cx<b$ refers to a set of
+affine conditions that guarantee each row in $M$ has at most one nonzero entry
+(i.e. that the matching is one-to-one).
+
+
+We then calculate the leading eigenvector of the $PWP$, where
+$P \in \R^{Nn \times Nn}$ is given by (add this in \dots)
+
+\subsection{Discretization of Matching Matrix}
+I normalized each by percents first, so that the largest \emph{relative} element of each column was chosen first.
+
+\section{Results}
+
+We generated 200 random graphs with $N=25 n=4$ and attempted to do this problem with no scaling.
+Over 200 trials, the average accuracy (correct number of nodes matched out of $n$) was $77.8\%$.
+
+In the case that the subgraphs were clustered within the graph, the accuracy improved to $81.4\%$
+
+I ran 50 trials on a linear mesh to estimate a scaling factor and was able to the correct scaling factor very closely:
+\begin{verbatim}
+best energy:  14.081932303
+corresp. accuracy:  100.0
+estimated scale_factor 1.2828789984
+real scale value: 1.277721655652504
+\end{verbatim}
+
+Note that the correct energy is simply $n^2=16$ given our similarity matrix.
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=.4\textwidth]{sample}
+    \caption{jlsakdsf}
+    %\label{fig:stuff}
+\end{figure}
+
+\section{Conclusion}
+
+\begin{itemize}
+
+  \item Thank you James.
+  \item The devil and Hitler had a baby and its name was matplotlib.pyplot
+  \item I need more RAM
+\end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{citation01}
+  Cour, Timothee, Praveen Srinivasan, and Jianbo Shi.
+  \emph{"Balanced graph matching."}
+  Advances in Neural Information Processing Systems 19 (2007): 313.
+\end{thebibliography}
+\end{document}

@@ -45,6 +45,8 @@ def _row_norm_matrix(A, shape=None):
 def random_vertices(N,n, clustered=False, transform=False, scale=False):
     """uniformly distributed points in xy-plane.
     a random subset of size n<=N is returned separately. 
+    
+    NOTE: scale X outside of this. scale parameter is deprecated
     """
     
     assert n <= N
@@ -84,6 +86,7 @@ def random_vertices(N,n, clustered=False, transform=False, scale=False):
     if scale:
         scale = 100*np.random.rand()
         X *= scale
+
     return A, X, id_extracted 
 
 def calculate_edges(M):

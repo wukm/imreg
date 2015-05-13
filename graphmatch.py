@@ -23,7 +23,8 @@ def build_similarities(D,d):
 
     W = W - W0 
     
-    W = 1 / (1 + abs(W))
+    W = abs(W)
+    W = 1 / (1 + W)
     return W
 
 def build_P(N,n):
@@ -65,9 +66,9 @@ def discretize(p):
 
     matches = []
     
-    # shift all scores to positive
-    #if (p < 0).any():
-    #    p += abs(p.min())
+    #shift all scores to positive
+    if (p < 0).any():
+        p += abs(p.min())
 
     # normalize p by columns (should grab best matches first now)
     p /= p.sum(axis=0)
@@ -104,7 +105,6 @@ def graph_match(D,d):
     N = D.shape[0]
     n = d.shape[0]
 
-    # note result is NOT inverted yet
     W = build_similarities(D,d)
     
     P, C = build_P(N,n)
@@ -142,9 +142,6 @@ def graph_match(D,d):
     energy = energy[0,0] 
 
     return est, energy
-
-def matching_problem():
-    pass
 
 def match_energy(W, p, shape=None):
     """

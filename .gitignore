@@ -2,3 +2,10 @@ __pycache__/*
 **/*.npz
 **/*.swp
 **/*.png
+
+# latex stuff
+**/*.aux
+**/*.log
+**/*.pdf
+**/*.toc
+
