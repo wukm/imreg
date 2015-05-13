@@ -27,7 +27,7 @@ def get_accuracy(real_vertices, estimated_vertices):
 
     return 100*(hits / real_vertices.size)
 
-def scaling_problem(make_figures=False):
+def scaling_problem(summary_figure=False, make_figures=False):
     
     N = 23
     n = 4
@@ -68,6 +68,8 @@ def scaling_problem(make_figures=False):
     # get the minimum and maximum possible scaling factors for the two graphs
     kmin, kmax = scale_range(D,d_unscaled) 
     
+    all_data = []
+
     best_accuracy = 0
     best_energy =  0
     estimated_scale = 0
@@ -90,6 +92,7 @@ def scaling_problem(make_figures=False):
         print('pairwise accuracy: {}%'.format(accuracy))
         print('energy:', energy)
         
+        all_data.append([k, accuracy, energy])
         if energy > best_energy:
             best_energy=energy
             best_accuracy=accuracy
@@ -100,6 +103,8 @@ def scaling_problem(make_figures=False):
     print("corresp. accuracy: ", best_accuracy)
     print("estimated scale_factor", estimated_scale)
     print("real scale value:", scale_by)
+    
+    return np.array(all_data).T
 
 def simple(make_figures=True): 
     """
@@ -187,5 +192,6 @@ def vary_sizes(figures=False):
 
 if __name__ == "__main__":
 
-    scaling_problem()
-    #simple_average()
+    from visual import scaling_energies
+    data = scaling_problem()
+    f = scaling_energies(data)
