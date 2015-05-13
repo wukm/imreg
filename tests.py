@@ -1,7 +1,7 @@
 #!/usr/bin/env/python3
 
 import numpy as np
-from graphmatch import graph_match
+from graphmatch import graph_match, match_energy, build_similarities
 from graphs import *
 from visual import compare_estimated, plot_system
 from matplotlib.pyplot import close
@@ -29,19 +29,25 @@ def get_accuracy(real_vertices, estimated_vertices):
 
 def scaling_problem(make_figures=False):
     
-    N = 60
-    n = 5
+    N = 23
+    n = 4
     mesh_size = 50
 
     A, X_ex, ids = random_vertices(N, n, transform=True)
 
     # now scale X by some amount
-    scale_by = np.random.uniform(low=0, high=10)
+    scale_by = np.random.uniform(low=1, high=10)
     X = X_ex / scale_by
     
-    # show it works on the exact subgraph
+    # test whether it works on the exact subgraph
     D = calculate_edges(A) 
     d = calculate_edges(X_ex)
+    
+    W = build_similarities(D,d)
+    exact_energy = match_energy(W, ids, shape=(N,n))
+
+    #del W
+    print('exact energy:', exact_energy)
 
     est, energy = graph_match(D, d)
     accuracy = get_accuracy(ids, est)
@@ -110,47 +116,45 @@ def simple(make_figures=True):
     print("N={}, n={}".format(N,n))
     print('pairwise accuracy: {}%'.format(accuracy))
     
-    return 
 
-def range
-def vary_sizes(figures=False):
-    """
-    finish this. this shows how the algorithm fares for different sizes of the
-    system, as well as size of the subgraph relative.
-    """
-    N = 30
-
-    percents = [.10,.33,.66,.90]
-
-
-    for p in percents:
-        n = max(int(N*p),1)
-    
-    assert N >= n
-
-    clustered= False
-    transform = True
-    scale= False
-
-    A, X, ids = random_vertices(N,n clustered,transform,scale)
-
-
-    # these are now the graph attributes of each graph
-    D = calculate_edges(A)
-    # you could also just 'extract' this from D if you're clever
-    d = calculate_edges(X)
-
-    est = graph_match(D,d)
-
-    #fig = compare_estimated(A,ids,est)
-
-    #if transform:
-    #    figt = plot_system(None, X)
-
-    accuracy = get_accuracy(ids, est)
-
-    print("N={}, n={}".format(N,n))
-    print('pairwise accuracy: {}%'.format(accuracy))
+#def vary_sizes(figures=False):
+#    """
+#    finish this. this shows how the algorithm fares for different sizes of the
+#    system, as well as size of the subgraph relative.
+#    """
+#    N = 30
+#
+#    percents = [.10,.33,.66,.90]
+#
+#
+#    for p in percents:
+#        n = max(int(N*p),1)
+#    
+#    assert N >= n
+#
+#    clustered= False
+#    transform = True
+#    scale= False
+#
+#    A, X, ids = random_vertices(N,n clustered,transform,scale)
+#
+#
+#    # these are now the graph attributes of each graph
+#    D = calculate_edges(A)
+#    # you could also just 'extract' this from D if you're clever
+#    d = calculate_edges(X)
+#
+#    est = graph_match(D,d)
+#
+#    #fig = compare_estimated(A,ids,est)
+#
+#    #if transform:
+#    #    figt = plot_system(None, X)
+#
+#    accuracy = get_accuracy(ids, est)
+#
+#    print("N={}, n={}".format(N,n))
+#    print('pairwise accuracy: {}%'.format(accuracy))
 
 if __name__ == "__main__":
 

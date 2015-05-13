@@ -22,8 +22,9 @@ def build_similarities(D,d):
     W0 = np.kron(D, np.ones(d.shape))
 
     W = W - W0 
-
-    return abs(W)
+    
+    W = 1 / (1 + abs(W))
+    return W
 
 def build_P(N,n):
 
@@ -64,15 +65,18 @@ def discretize(p):
 
     matches = []
     
-    # normalize p (should grab best matches first now)
+    # shift all scores to positive
+    #if (p < 0).any():
+    #    p += abs(p.min())
+
+    # normalize p by columns (should grab best matches first now)
     p /= p.sum(axis=0)
 
     mask_val = -np.inf 
     for i in range(p.shape[1]):
         # find the highest remaining element
         w = np.unravel_index(p.argmax(), p.shape)
-        # "zero out" its row and column in a noninterfering way (if p was
-        # overwhelming negative this could be buggy  
+        # "zero out" its row and column in a noninterfering way
 
         p[w[0],:] = mask_val
         p[:,w[1]] = mask_val
@@ -102,8 +106,6 @@ def graph_match(D,d):
 
     # note result is NOT inverted yet
     W = build_similarities(D,d)
-    # invert it (gauss kernel seems too small, idk)
-    W = 1 / (W + 1) 
     
     P, C = build_P(N,n)
 
@@ -140,6 +142,38 @@ def graph_match(D,d):
     energy = energy[0,0] 
 
     return est, energy
+
+def matching_problem():
+    pass
+
+def match_energy(W, p, shape=None):
+    """
+    get the energy (x.T)Wx associated with a given matching.
+
+    INPUT:
+    p:  if p.dim == 2, it will be interpreted as a (N,n) matching matrix
+        if p.dim < 2, it will be interpreted as a sequence of vertices, s.t.
+            p[i] = j <-> xi matches with aj
+    W:  the (N*n, N*n) similarity matrix for the graph and subgraph
+    shape:  if p is not already a (N,n) matrix
+
+    OUTPUT:
+    E:  a floating point number energy (x.T)W(x) where X is a (N*n,2) row vector
+        which should be maximized for a perfect match
+
+    """
+    
+    # is p is a list of vertex matches
+    if (p.ndim < 2) and (p.size != W.shape[0]):
+        x = np.zeros((shape))
+        x[p, range(p.size)] = 1
+    
+    # columnize it
+    x = x.reshape(-1,1) 
+    
+    E = x.T.dot(W).dot(x)
+    
+    return E[0,0]
 
 if __name__ == "__main__":
     
