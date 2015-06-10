@@ -7,7 +7,7 @@ import scipy.sparse.linalg
 
 """
 All functions in graphs.py relate to generating sample graphs (and subgraphs)
-as problems for graphmatch. The these graphs generally have a blah blha blha
+as problems for graphmatch.
 """
 
 def _row_norm_matrix(A, shape=None):

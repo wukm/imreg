@@ -9,3 +9,6 @@ __pycache__/*
 **/*.pdf
 **/*.toc
 
+# figures & blobs
+*.svg
+figures/*

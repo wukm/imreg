@@ -1,5 +1,13 @@
 #!/usr/bin/env/python3
+"""
+The following is a suite of tests for various sorts of systems.
+Options for printing figures.
 
+Of note:
+    - scaling_problem attempts to register a graph that has been transformed in
+      a way that involves a unknown scale factor
+    - simple solves the problem without scaling for a particular N and n
+"""
 import numpy as np
 from graphmatch import graph_match, match_energy, build_similarities
 from graphs import *
