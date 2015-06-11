@@ -10,3 +10,7 @@ normalization of W, S
 what kernel (gaussian, 1/(abs + 1), etc)
 discretization method
 
+
+CODE
+actually use masking for the discretization of the matching
+    (see function graphmatch.discretize)

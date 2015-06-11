@@ -28,13 +28,16 @@ def build_similarities(D,d):
     return W
 
 def build_P(N,n):
-
+    """
+    build the matrix P_C as described in SMAC. The C below is a constraint
+    matrix that asserts one-to-oneness of the found matching
+    """
     # these are the N "one-to-one" constraints, shape (N,N*n)
-    ii = [i//n for i in range(N*n)]
-    jj = [i for i in range(n*N)]
-    C = scipy.sparse.csc_matrix((np.ones(n*N),(ii,jj)))
-    # okay, just undo it for now because i wanna simplify
-    C = C.toarray()
+    ii = (i//n for i in range(N*n))
+    jj = (i for i in range(n*N))
+    C = np.zeros((n, N*n))
+    for i,j in zip(ii,jj):
+        C[i,j] = 1
 
     # now i'm just following notation from the paper
     b = np.ones((N,1))
