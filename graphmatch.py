@@ -35,9 +35,9 @@ def build_P(N,n):
     # these are the N "one-to-one" constraints, shape (N,N*n)
     ii = (i//n for i in range(N*n))
     jj = (i for i in range(n*N))
-    C = np.zeros((n, N*n))
+    C = np.zeros((N, N*n))
     for i,j in zip(ii,jj):
-        C[i,j] = 1
+        C[i,j] = 1.0
 
     # now i'm just following notation from the paper
     b = np.ones((N,1))
